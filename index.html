@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | In Development</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #003366 0%, #001122 80%, #000000 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .portfolio-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            background: rgba(0, 20, 40, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 20px rgba(0, 255, 255, 0.05);
+            color: #e0f7fa;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .profile-photo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #00ffcc;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+            margin-bottom: 20px;
+            background-color: #002233;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        p.bio {
+            margin: 0 0 25px 0;
+            font-size: 1.1em;
+            color: #80deea;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 20px;
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid #ff3333;
+            border-radius: 30px;
+            font-size: 0.9em;
+            color: #ffcccc;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 50, 50, 0.4);
+            animation: pulse-badge 2s infinite;
+        }
+
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff3333;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 8px #ff3333;
+        }
+
+        @keyframes pulse-badge {
+            0% { box-shadow: 0 0 10px rgba(255, 50, 50, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(255, 50, 50, 0.7); }
+            100% { box-shadow: 0 0 10px rgba(255, 50, 50, 0.3); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="portfolio-container">
+        <!-- Ganti src di bawah ini dengan path atau link foto aslimu -->
+        <img src="https://via.placeholder.com/150/002233/00ffcc?text=Foto+Profil" alt="Profile Photo" class="profile-photo">
+        <h1>Nama Kamu</h1>
+        <p class="bio">Frontend Developer & Network Enthusiast.<br>Membangun sesuatu yang luar biasa.</p>
+        
+        <div class="status-badge">
+            <span class="dot"></span> In Development
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const towers = [];
+        const pulses = [];
+        const bubbles = [];
+        const fishes = [];
+        const rainDrops = [];
+        let frameCount = 0;
+
+        // Kode Awan
+        const codeStrings = [
+            "0x8F2A int main(){ void* ptr = &mem; return 0; } SYS_INIT...",
+            "BUFFER_OVERFLOW_AVOIDED | CONNECTING_BTS_NODES [OK]",
+            "TCP/IP_HANDSHAKE_ESTABLISHED // 192.168.1.1:8080 // FETCHING",
+            "DATA_LINK_LAYER_ACTIVE : FIBER_OPTIC_RESONANCE = TRUE"
+        ];
+        let cloudOffset = 0;
+
+        function init() {
+            // Setup Menara
+            towers.push({ x: w / 2, y: h / 2 + 50, isCenter: true }); // Center
+            const satCount = 4;
+            const radius = Math.min(w, h) * 0.35;
+            for (let i = 0; i < satCount; i++) {
+                let angle = (i * Math.PI * 2) / satCount;
+                towers.push({
+                    x: w / 2 + Math.cos(angle) * radius,
+                    y: h / 2 + 50 + Math.sin(angle) * radius * 0.5,
+                    isCenter: false,
+                    cooldown: 0
+                });
+            }
+
+            // Setup Gelembung
+            for (let i = 0; i < 40; i++) {
+                bubbles.push({
+                    x: Math.random() * w, y: Math.random() * h,
+                    r: Math.random() * 4 + 1, v: Math.random() * 1 + 0.5
+                });
+            }
+
+            // Setup Ikan Robot
+            for (let i = 0; i < 6; i++) {
+                fishes.push({
+                    x: Math.random() * w, y: h * 0.4 + Math.random() * (h * 0.5),
+                    vx: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random()), vy: 0,
+                    targetVy: 0, size: 15 + Math.random() * 10,
+                    timer: Math.random() * 100, wifiTick: Math.random() * 100
+                });
+            }
+
+            // Setup Matrix Rain
+            for (let i = 0; i < 60; i++) {
+                rainDrops.push({
+                    x: Math.random() * w, y: Math.random() * (h * 0.4),
+                    v: 1 + Math.random() * 2, char: Math.random() > 0.5 ? '0' : '1'
+                });
+            }
+        }
+
+        class Pulse {
+            constructor(x, y, maxR, isCenter) {
+                this.x = x; this.y = y; this.r = 10;
+                this.maxR = maxR; this.speed = isCenter ? 3.5 : 2.5;
+                this.isCenter = isCenter; this.active = true;
+            }
+
+            update() {
+                this.r += this.speed;
+                if (this.r > this.maxR) this.active = false;
+
+                if (this.isCenter) {
+                    towers.forEach(t => {
+                        if (!t.isCenter && t.cooldown <= 0) {
+                            let dist = Math.hypot(this.x - t.x, this.y - t.y);
+                            if (Math.abs(this.r - dist) < this.speed + 1) {
+                                pulses.push(new Pulse(t.x, t.y, 300, false));
+                                t.cooldown = 100;
+                            }
+                        }
+                    });
+                }
+            }
+
+            draw(ctx) {
+                let ratio = this.r / this.maxR;
+                let cR, cG, cB = 0;
+
+                // Gradien Pulse: Hijau -> Merah -> Hitam
+                if (ratio < 0.5) {
+                    let localRatio = ratio / 0.5;
+                    cR = Math.floor(localRatio * 255);
+                    cG = Math.floor((1 - localRatio) * 255);
+                } else {
+                    let localRatio = (ratio - 0.5) / 0.5;
+                    cR = Math.floor((1 - localRatio) * 255 + localRatio * 20);
+                    cG = 0;
+                }
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(${cR}, ${cG}, ${cB}, ${1 - ratio})`;
+                ctx.lineWidth = this.isCenter ? 3 : 1.5;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function drawEnvironment() {
+            // Awan Kode
+            ctx.fillStyle = 'rgba(0, 255, 204, 0.15)';
+            ctx.font = '12px monospace';
+            cloudOffset -= 0.5;
+            if (cloudOffset < -1000) cloudOffset = 0;
+            
+            for (let j = 0; j < codeStrings.length; j++) {
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillText(codeStrings[j], cloudOffset + (i * 1000), 30 + (j * 25));
+                }
+            }
+
+            // Hujan Biner (Matrix)
+            ctx.fillStyle = 'rgba(0, 255, 204, 0.3)';
+            rainDrops.forEach(drop => {
+                ctx.fillText(drop.char, drop.x, drop.y);
+                drop.y += drop.v;
+                if (frameCount % 10 === 0 && Math.random() > 0.8) drop.char = Math.random() > 0.5 ? '0' : '1';
+                if (drop.y > h * 0.6) drop.y = -20;
+            });
+
+            // Gelembung Air
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            bubbles.forEach(b => {
+                ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke();
+                b.y -= b.v; b.x += Math.sin(b.y * 0.05) * 0.3;
+                if (b.y < 0) { b.y = h + 10; b.x = Math.random() * w; }
+            });
+
+            // Ikan Robot
+            fishes.forEach(f => {
+                f.x += f.vx; f.y += f.vy;
+                if (f.x < -50) f.x = w + 50;
+                if (f.x > w + 50) f.x = -50;
+
+                f.timer++;
+                if (f.timer > 80) {
+                    f.timer = 0;
+                    f.vx = Math.sign(f.vx) * (0.8 + Math.random());
+                    f.targetVy = (Math.random() - 0.5) * 0.8;
+                }
+                f.vy += (f.targetVy - f.vy) * 0.1; // Gerak patah-patah
+                f.wifiTick += 2;
+
+                ctx.save();
+                ctx.globalAlpha = 0.2; // Memudar di kejauhan
+                ctx.translate(f.x, f.y);
+                
+                // Badan Ikan (Bentuk Robotik)
+                ctx.fillStyle = '#80deea';
+                ctx.beginPath();
+                if (f.vx > 0) {
+                    ctx.moveTo(f.size, 0); ctx.lineTo(-f.size, -f.size / 2.5); ctx.lineTo(-f.size, f.size / 2.5);
+                } else {
+                    ctx.moveTo(-f.size, 0); ctx.lineTo(f.size, -f.size / 2.5); ctx.lineTo(f.size, f.size / 2.5);
+                }
+                ctx.fill();
+                
+                // Sinyal Wi-Fi
+                ctx.strokeStyle = '#00ffcc';
+                ctx.lineWidth = 1;
+                let wifiCycle = (f.wifiTick % 100) / 100;
+                for (let i = 1; i <= 3; i++) {
+                    if (wifiCycle * 3 > i - 1) {
+                        ctx.beginPath();
+                        ctx.arc(0, -f.size * 0.8, i * 4, Math.PI * 1.25, Math.PI * 1.75);
+                        ctx.stroke();
+                    }
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawInfrastructure() {
+            // Kabel Fiber Optik
+            towers.forEach(t => {
+                // Kabel dari tulang punggung dasar layar ke BTS
+                let grad = ctx.createLinearGradient(t.x, h, t.x, t.y);
+                grad.addColorStop(0, '#00ff00'); // Hijau di bawah
+                grad.addColorStop(1, '#ff0000'); // Merah di atas
+                
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = t.isCenter ? 4 : 2;
+                ctx.beginPath(); ctx.moveTo(t.x, h); ctx.lineTo(t.x, t.y); ctx.stroke();
+
+                if (!t.isCenter) {
+                    let gradConn = ctx.createLinearGradient(w/2, h/2+50, t.x, t.y);
+                    gradConn.addColorStop(0, '#ff0000'); gradConn.addColorStop(1, '#00ff00');
+                    ctx.strokeStyle = gradConn; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.moveTo(w/2, h/2+50); ctx.lineTo(t.x, t.y); ctx.stroke();
+                }
+            });
+
+            // Konstruksi Menara
+            towers.forEach(t => {
+                ctx.save();
+                ctx.translate(t.x, t.y);
+                
+                ctx.fillStyle = '#334455';
+                let th = t.isCenter ? 60 : 35; let tw = t.isCenter ? 14 : 8;
+                ctx.fillRect(-tw/2, -th, tw, th);
+                
+                ctx.fillStyle = '#00ffcc';
+                ctx.beginPath();
+                ctx.moveTo(-tw, -th); ctx.lineTo(tw, -th); ctx.lineTo(0, -th - (t.isCenter ? 25 : 15));
+                ctx.fill();
+
+                ctx.fillStyle = (frameCount % 60 < 30) ? '#ff3333' : '#00ffcc';
+                ctx.beginPath();
+                ctx.arc(0, -th - (t.isCenter ? 25 : 15), t.isCenter ? 4 : 2.5, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.restore();
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+            
+            drawEnvironment();
+            drawInfrastructure();
+
+            if (frameCount % 150 === 0) {
+                pulses.push(new Pulse(w/2, h/2+50, Math.max(w, h) * 0.8, true));
+            }
+
+            for (let i = pulses.length - 1; i >= 0; i--) {
+                pulses[i].update(); pulses[i].draw(ctx);
+                if (!pulses[i].active) pulses.splice(i, 1);
+            }
+
+            towers.forEach(t => { if(t.cooldown > 0) t.cooldown--; });
+
+            frameCount++;
+            requestAnimationFrame(animate);
+        }
+
+        init(); animate();
+    </script>
+</body>
+</html>
