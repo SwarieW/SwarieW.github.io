@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | In Development</title>
+    <title>Portfolio | William Halim</title>
     <style>
         body, html {
             margin: 0;
@@ -11,8 +11,9 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: radial-gradient(circle at center, #003366 0%, #001122 80%, #000000 100%);
+            background-color: #001122;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: default;
         }
 
         #bg-canvas {
@@ -24,162 +25,220 @@
             z-index: 1;
         }
 
+        /* UI PROFILE CARD */
         .portfolio-container {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.9);
             z-index: 10;
             text-align: center;
-            background: rgba(0, 20, 40, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 20px rgba(0, 255, 255, 0.05);
+            background: rgba(4, 18, 30, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px 50px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.05);
             color: #e0f7fa;
-            width: 90%;
-            max-width: 400px;
+            width: 85%;
+            max-width: 350px;
+            opacity: 0; /* Disembunyikan di awal */
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .portfolio-container.active {
+            opacity: 1; /* Tampil saat active */
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .profile-photo-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(135deg, #00ffcc, #0088aa);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
         }
 
         .profile-photo {
-            width: 140px;
-            height: 140px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #00ffcc;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
-            margin-bottom: 20px;
-            background-color: #002233;
+            border: 3px solid #04121e;
         }
 
         h1 {
-            margin: 0 0 10px 0;
-            font-size: 2em;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            margin: 0 0 8px 0;
+            font-size: 1.8em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
         }
 
         p.bio {
-            margin: 0 0 25px 0;
-            font-size: 1.1em;
+            margin: 0 0 30px 0;
+            font-size: 0.95em;
             color: #80deea;
-            line-height: 1.5;
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 8px 20px;
-            background: rgba(255, 50, 50, 0.1);
-            border: 1px solid #ff3333;
+            padding: 8px 24px;
+            background: transparent;
+            border: 1px solid rgba(255, 50, 50, 0.6);
             border-radius: 30px;
-            font-size: 0.9em;
+            font-size: 0.8em;
+            font-weight: bold;
             color: #ffcccc;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(255, 50, 50, 0.4);
-            animation: pulse-badge 2s infinite;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 10px rgba(255, 50, 50, 0.2), inset 0 0 10px rgba(255, 50, 50, 0.1);
         }
 
         .status-badge .dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background-color: #ff3333;
             border-radius: 50%;
             margin-right: 10px;
             box-shadow: 0 0 8px #ff3333;
+            animation: pulse-dot 1.5s infinite;
         }
 
-        @keyframes pulse-badge {
-            0% { box-shadow: 0 0 10px rgba(255, 50, 50, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(255, 50, 50, 0.7); }
-            100% { box-shadow: 0 0 10px rgba(255, 50, 50, 0.3); }
+        @keyframes pulse-dot {
+            0% { opacity: 0.5; box-shadow: 0 0 4px #ff3333; }
+            50% { opacity: 1; box-shadow: 0 0 12px #ff3333; }
+            100% { opacity: 0.5; box-shadow: 0 0 4px #ff3333; }
+        }
+
+        #interaction-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(0, 255, 204, 0.7);
+            font-size: 0.9em;
+            pointer-events: none;
+            z-index: 5;
+            letter-spacing: 1px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
+    
+    <div id="interaction-hint">Klik BTS Tengah untuk Membuka Profil</div>
 
-    <div class="portfolio-container">
-        <!-- Ganti src di bawah ini dengan path atau link foto aslimu -->
-        <img src="ProfilePict.png" alt="Profile Photo" class="profile-photo">
+    <div class="portfolio-container" id="profileCard">
+        <div class="profile-photo-wrapper">
+            <!-- Ganti src di bawah dengan link/path fotomu aslimu -->
+            <img src="https://via.placeholder.com/150/002233/00ffcc?text=William" alt="William Halim" class="profile-photo">
+        </div>
         <h1>William Halim</h1>
         <p class="bio">Developer & Network Enthusiast.</p>
         
         <div class="status-badge">
-            <span class="dot"></span> In Development
+            <span class="dot"></span> IN DEVELOPMENT
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let w, h;
+        const card = document.getElementById('profileCard');
+        const hint = document.getElementById('interaction-hint');
+        let w, h, groundLevel, seabedLevel;
+
+        let towers = [], pulses = [], fishes = [], rainDrops = [];
+        let frameCount = 0;
+        let cloudOffset = 0;
 
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
+            groundLevel = h * 0.55; // Garis tanah
+            seabedLevel = h * 0.95; // Dasar laut
+            init(); 
         }
         window.addEventListener('resize', resize);
-        resize();
 
-        const towers = [];
-        const pulses = [];
-        const bubbles = [];
-        const fishes = [];
-        const rainDrops = [];
-        let frameCount = 0;
+        // --- SISTEM INTERAKSI KLIK ---
+        let isHoveringCenter = false;
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const centerT = towers.find(t => t.isCenter);
+            if (centerT) {
+                // Deteksi hitbox BTS tengah (diperlebar sedikit agar nyaman)
+                if (Math.abs(mouseX - centerT.x) < 40 && mouseY > groundLevel - centerT.th - 20 && mouseY <= groundLevel) {
+                    canvas.style.cursor = 'pointer';
+                    isHoveringCenter = true;
+                } else {
+                    canvas.style.cursor = 'default';
+                    isHoveringCenter = false;
+                }
+            }
+        });
 
-        // Kode Awan
-        const codeStrings = [
-            "0x8F2A int main(){ void* ptr = &mem; return 0; } SYS_INIT...",
-            "BUFFER_OVERFLOW_AVOIDED | CONNECTING_BTS_NODES [OK]",
-            "TCP/IP_HANDSHAKE_ESTABLISHED // 192.168.1.1:8080 // FETCHING",
-            "DATA_LINK_LAYER_ACTIVE : FIBER_OPTIC_RESONANCE = TRUE"
-        ];
-        let cloudOffset = 0;
+        canvas.addEventListener('click', (e) => {
+            if (isHoveringCenter) {
+                // Membuka UI Card
+                card.classList.add('active');
+                hint.style.display = 'none';
+            } else if (!card.contains(e.target)) {
+                // Menutup UI Card jika klik di luar
+                card.classList.remove('active');
+                hint.style.display = 'block';
+            }
+        });
 
         function init() {
-            // Setup Menara
-            towers.push({ x: w / 2, y: h / 2 + 50, isCenter: true }); // Center
-            const satCount = 4;
-            const radius = Math.min(w, h) * 0.35;
-            for (let i = 0; i < satCount; i++) {
-                let angle = (i * Math.PI * 2) / satCount;
-                towers.push({
-                    x: w / 2 + Math.cos(angle) * radius,
-                    y: h / 2 + 50 + Math.sin(angle) * radius * 0.5,
-                    isCenter: false,
-                    cooldown: 0
-                });
-            }
+            towers = []; pulses = []; fishes = []; rainDrops = [];
+            
+            // Susunan Tower BTS (Side-View)
+            let centerTh = 100;
+            towers.push({ x: w / 2, y: groundLevel, isCenter: true, th: centerTh, tw: 30, cooldown: 0 });
+            
+            const gap = Math.min(w * 0.2, 200);
+            const satTh = 60; const satTw = 15;
+            towers.push({ x: w / 2 - gap, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
+            towers.push({ x: w / 2 - gap * 2, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
+            towers.push({ x: w / 2 + gap, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
+            towers.push({ x: w / 2 + gap * 2, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
 
-            // Setup Gelembung
-            for (let i = 0; i < 40; i++) {
-                bubbles.push({
-                    x: Math.random() * w, y: Math.random() * h,
-                    r: Math.random() * 4 + 1, v: Math.random() * 1 + 0.5
-                });
-            }
-
-            // Setup Ikan Robot
-            for (let i = 0; i < 6; i++) {
+            // Setup Ikan Robot Bawah Air
+            for (let i = 0; i < 5; i++) {
                 fishes.push({
-                    x: Math.random() * w, y: h * 0.4 + Math.random() * (h * 0.5),
-                    vx: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random()), vy: 0,
-                    targetVy: 0, size: 15 + Math.random() * 10,
+                    x: Math.random() * w,
+                    y: groundLevel + 40 + Math.random() * (seabedLevel - groundLevel - 80),
+                    vx: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random()),
+                    vy: 0, targetVy: 0, size: 20 + Math.random() * 10,
                     timer: Math.random() * 100, wifiTick: Math.random() * 100
                 });
             }
 
-            // Setup Matrix Rain
-            for (let i = 0; i < 60; i++) {
+            // Hujan Angka Biner
+            for (let i = 0; i < 40; i++) {
                 rainDrops.push({
-                    x: Math.random() * w, y: Math.random() * (h * 0.4),
-                    v: 1 + Math.random() * 2, char: Math.random() > 0.5 ? '0' : '1'
+                    x: Math.random() * w, y: Math.random() * groundLevel,
+                    v: 1 + Math.random() * 1.5, char: Math.random() > 0.5 ? '0' : '1'
                 });
             }
         }
@@ -187,7 +246,7 @@
         class Pulse {
             constructor(x, y, maxR, isCenter) {
                 this.x = x; this.y = y; this.r = 10;
-                this.maxR = maxR; this.speed = isCenter ? 3.5 : 2.5;
+                this.maxR = maxR; this.speed = isCenter ? 2.5 : 1.5;
                 this.isCenter = isCenter; this.active = true;
             }
 
@@ -198,10 +257,10 @@
                 if (this.isCenter) {
                     towers.forEach(t => {
                         if (!t.isCenter && t.cooldown <= 0) {
-                            let dist = Math.hypot(this.x - t.x, this.y - t.y);
+                            let dist = Math.abs(this.x - t.x);
                             if (Math.abs(this.r - dist) < this.speed + 1) {
-                                pulses.push(new Pulse(t.x, t.y, 300, false));
-                                t.cooldown = 100;
+                                pulses.push(new Pulse(t.x, t.y - t.th, 200, false));
+                                t.cooldown = 120;
                             }
                         }
                     });
@@ -212,20 +271,21 @@
                 let ratio = this.r / this.maxR;
                 let cR, cG, cB = 0;
 
-                // Gradien Pulse: Hijau -> Merah -> Hitam
+                // Gradien Pulse: Hijau -> Merah -> Fade
                 if (ratio < 0.5) {
                     let localRatio = ratio / 0.5;
                     cR = Math.floor(localRatio * 255);
-                    cG = Math.floor((1 - localRatio) * 255);
+                    cG = Math.floor((1 - localRatio) * 150 + 100);
                 } else {
                     let localRatio = (ratio - 0.5) / 0.5;
-                    cR = Math.floor((1 - localRatio) * 255 + localRatio * 20);
+                    cR = Math.floor((1 - localRatio) * 255 + localRatio * 50);
                     cG = 0;
                 }
 
                 ctx.save();
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                // Arc Math.PI ke 0 membuat lengkungan menghadap ke ATAS
+                ctx.arc(this.x, this.y, this.r, Math.PI, 0);
                 ctx.strokeStyle = `rgba(${cR}, ${cG}, ${cB}, ${1 - ratio})`;
                 ctx.lineWidth = this.isCenter ? 3 : 1.5;
                 ctx.stroke();
@@ -234,41 +294,64 @@
         }
 
         function drawEnvironment() {
-            // Awan Kode
-            ctx.fillStyle = 'rgba(0, 255, 204, 0.15)';
-            ctx.font = '12px monospace';
-            cloudOffset -= 0.5;
-            if (cloudOffset < -1000) cloudOffset = 0;
+            // Langit
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, groundLevel);
+            skyGrad.addColorStop(0, '#001122'); skyGrad.addColorStop(1, '#002233');
+            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, groundLevel);
+
+            // Bawah Tanah / Air
+            let seaGrad = ctx.createLinearGradient(0, groundLevel, 0, h);
+            seaGrad.addColorStop(0, '#001a33'); seaGrad.addColorStop(1, '#000511');
+            ctx.fillStyle = seaGrad; ctx.fillRect(0, groundLevel, w, h - groundLevel);
+
+            // Garis pembatas
+            ctx.strokeStyle = '#ffff00'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, groundLevel); ctx.lineTo(w, groundLevel); ctx.stroke();
             
-            for (let j = 0; j < codeStrings.length; j++) {
-                for (let i = 0; i < 3; i++) {
-                    ctx.fillText(codeStrings[j], cloudOffset + (i * 1000), 30 + (j * 25));
-                }
+            ctx.strokeStyle = '#00aaff'; 
+            ctx.beginPath(); ctx.moveTo(0, seabedLevel); ctx.lineTo(w, seabedLevel); ctx.stroke();
+            
+            // Tekstur air seabed
+            ctx.strokeStyle = '#00aaff'; ctx.lineWidth = 2;
+            for(let i=0; i<w; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i, seabedLevel + 10); ctx.lineTo(i - 20, h); ctx.stroke();
             }
 
-            // Hujan Biner (Matrix)
-            ctx.fillStyle = 'rgba(0, 255, 204, 0.3)';
+            // Awan & Kode
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.font = '14px monospace';
+            cloudOffset -= 0.3;
+            if (cloudOffset < -w) cloudOffset = 0;
+            
+            const cloudCode = "01001100 01001111 01000001 01000100 01001001 01001110 01000111";
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.arc(cloudOffset + w*i + 100, 50, 40, 0, Math.PI*2);
+                ctx.arc(cloudOffset + w*i + 150, 40, 50, 0, Math.PI*2);
+                ctx.arc(cloudOffset + w*i + 200, 50, 40, 0, Math.PI*2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.3)';
+                ctx.fillText(cloudCode, cloudOffset + w*i + 80, 50);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            }
+
+            // Hujan 01
+            ctx.fillStyle = 'rgba(255, 50, 50, 0.4)';
+            ctx.font = '12px monospace';
             rainDrops.forEach(drop => {
                 ctx.fillText(drop.char, drop.x, drop.y);
                 drop.y += drop.v;
-                if (frameCount % 10 === 0 && Math.random() > 0.8) drop.char = Math.random() > 0.5 ? '0' : '1';
-                if (drop.y > h * 0.6) drop.y = -20;
-            });
-
-            // Gelembung Air
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = 1;
-            bubbles.forEach(b => {
-                ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke();
-                b.y -= b.v; b.x += Math.sin(b.y * 0.05) * 0.3;
-                if (b.y < 0) { b.y = h + 10; b.x = Math.random() * w; }
+                if (frameCount % 15 === 0 && Math.random() > 0.8) drop.char = Math.random() > 0.5 ? '0' : '1';
+                if (drop.y > groundLevel) drop.y = 0;
             });
 
             // Ikan Robot
             fishes.forEach(f => {
                 f.x += f.vx; f.y += f.vy;
-                if (f.x < -50) f.x = w + 50;
-                if (f.x > w + 50) f.x = -50;
+                if (f.x < -50) f.x = w + 50; if (f.x > w + 50) f.x = -50;
+                if (f.y < groundLevel + 20) f.y = groundLevel + 20;
+                if (f.y > seabedLevel - 20) f.y = seabedLevel - 20;
 
                 f.timer++;
                 if (f.timer > 80) {
@@ -276,32 +359,24 @@
                     f.vx = Math.sign(f.vx) * (0.8 + Math.random());
                     f.targetVy = (Math.random() - 0.5) * 0.8;
                 }
-                f.vy += (f.targetVy - f.vy) * 0.1; // Gerak patah-patah
-                f.wifiTick += 2;
+                f.vy += (f.targetVy - f.vy) * 0.1; f.wifiTick += 2;
 
-                ctx.save();
-                ctx.globalAlpha = 0.2; // Memudar di kejauhan
-                ctx.translate(f.x, f.y);
-                
-                // Badan Ikan (Bentuk Robotik)
-                ctx.fillStyle = '#80deea';
+                ctx.save(); ctx.globalAlpha = 0.4; ctx.translate(f.x, f.y);
+                ctx.strokeStyle = '#3366ff'; ctx.lineWidth = 2;
                 ctx.beginPath();
                 if (f.vx > 0) {
-                    ctx.moveTo(f.size, 0); ctx.lineTo(-f.size, -f.size / 2.5); ctx.lineTo(-f.size, f.size / 2.5);
+                    ctx.moveTo(f.size, 0); ctx.lineTo(-f.size, -f.size/2); ctx.lineTo(-f.size, f.size/2); ctx.closePath(); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(-f.size, 0); ctx.lineTo(-f.size*1.5, -f.size/2); ctx.lineTo(-f.size*1.5, f.size/2); ctx.closePath(); ctx.stroke();
                 } else {
-                    ctx.moveTo(-f.size, 0); ctx.lineTo(f.size, -f.size / 2.5); ctx.lineTo(f.size, f.size / 2.5);
+                    ctx.moveTo(-f.size, 0); ctx.lineTo(f.size, -f.size/2); ctx.lineTo(f.size, f.size/2); ctx.closePath(); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(f.size, 0); ctx.lineTo(f.size*1.5, -f.size/2); ctx.lineTo(f.size*1.5, f.size/2); ctx.closePath(); ctx.stroke();
                 }
-                ctx.fill();
                 
-                // Sinyal Wi-Fi
-                ctx.strokeStyle = '#00ffcc';
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#3366ff'; ctx.lineWidth = 1.5;
                 let wifiCycle = (f.wifiTick % 100) / 100;
                 for (let i = 1; i <= 3; i++) {
                     if (wifiCycle * 3 > i - 1) {
-                        ctx.beginPath();
-                        ctx.arc(0, -f.size * 0.8, i * 4, Math.PI * 1.25, Math.PI * 1.75);
-                        ctx.stroke();
+                        ctx.beginPath(); ctx.arc(0, -f.size * 0.8, i * 5, Math.PI * 1.25, Math.PI * 1.75); ctx.stroke();
                     }
                 }
                 ctx.restore();
@@ -309,56 +384,48 @@
         }
 
         function drawInfrastructure() {
-            // Kabel Fiber Optik
-            towers.forEach(t => {
-                // Kabel dari tulang punggung dasar layar ke BTS
-                let grad = ctx.createLinearGradient(t.x, h, t.x, t.y);
-                grad.addColorStop(0, '#00ff00'); // Hijau di bawah
-                grad.addColorStop(1, '#ff0000'); // Merah di atas
+            // Fiber Backbone
+            let centerT = towers.find(t => t.isCenter);
+            if (centerT) {
+                let grad = ctx.createLinearGradient(centerT.x, seabedLevel, centerT.x, groundLevel);
+                grad.addColorStop(0, '#00ff00'); grad.addColorStop(1, '#ff0000');
                 
-                ctx.strokeStyle = grad;
-                ctx.lineWidth = t.isCenter ? 4 : 2;
-                ctx.beginPath(); ctx.moveTo(t.x, h); ctx.lineTo(t.x, t.y); ctx.stroke();
+                ctx.strokeStyle = grad; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(centerT.x, seabedLevel); ctx.lineTo(centerT.x, groundLevel); ctx.stroke();
+            }
 
-                if (!t.isCenter) {
-                    let gradConn = ctx.createLinearGradient(w/2, h/2+50, t.x, t.y);
-                    gradConn.addColorStop(0, '#ff0000'); gradConn.addColorStop(1, '#00ff00');
-                    ctx.strokeStyle = gradConn; ctx.lineWidth = 1.5;
-                    ctx.beginPath(); ctx.moveTo(w/2, h/2+50); ctx.lineTo(t.x, t.y); ctx.stroke();
+            // Struktur BTS
+            towers.forEach(t => {
+                ctx.save(); ctx.translate(t.x, t.y);
+                ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-t.tw/2, 0); ctx.lineTo(0, -t.th);
+                ctx.moveTo(t.tw/2, 0); ctx.lineTo(0, -t.th);
+                ctx.moveTo(-t.tw/3, -t.th/3); ctx.lineTo(t.tw/3, -t.th/3);
+                ctx.moveTo(-t.tw/6, -t.th*2/3); ctx.lineTo(t.tw/6, -t.th*2/3);
+                ctx.stroke();
+
+                // Efek Neon jika kursor Hover BTS Tengah
+                if (t.isCenter && isHoveringCenter) {
+                    ctx.shadowColor = '#00ffcc'; ctx.shadowBlur = 15;
+                    ctx.strokeStyle = '#00ffcc'; ctx.stroke();
+                } else if (t.isCenter) {
+                     ctx.shadowColor = 'rgba(255,255,255,0.3)'; ctx.shadowBlur = 5;
+                     ctx.strokeStyle = '#ffffff'; ctx.stroke();
+                } else {
+                     ctx.strokeStyle = '#ffffff'; ctx.stroke();
                 }
-            });
-
-            // Konstruksi Menara
-            towers.forEach(t => {
-                ctx.save();
-                ctx.translate(t.x, t.y);
-                
-                ctx.fillStyle = '#334455';
-                let th = t.isCenter ? 60 : 35; let tw = t.isCenter ? 14 : 8;
-                ctx.fillRect(-tw/2, -th, tw, th);
-                
-                ctx.fillStyle = '#00ffcc';
-                ctx.beginPath();
-                ctx.moveTo(-tw, -th); ctx.lineTo(tw, -th); ctx.lineTo(0, -th - (t.isCenter ? 25 : 15));
-                ctx.fill();
-
-                ctx.fillStyle = (frameCount % 60 < 30) ? '#ff3333' : '#00ffcc';
-                ctx.beginPath();
-                ctx.arc(0, -th - (t.isCenter ? 25 : 15), t.isCenter ? 4 : 2.5, 0, Math.PI*2);
-                ctx.fill();
-
                 ctx.restore();
             });
         }
 
         function animate() {
             ctx.clearRect(0, 0, w, h);
-            
-            drawEnvironment();
-            drawInfrastructure();
+            drawEnvironment(); drawInfrastructure();
 
-            if (frameCount % 150 === 0) {
-                pulses.push(new Pulse(w/2, h/2+50, Math.max(w, h) * 0.8, true));
+            let centerT = towers.find(t => t.isCenter);
+            if (centerT && frameCount % 120 === 0) {
+                pulses.push(new Pulse(centerT.x, centerT.y - centerT.th, Math.max(w, h) * 0.6, true));
             }
 
             for (let i = pulses.length - 1; i >= 0; i--) {
@@ -372,7 +439,7 @@
             requestAnimationFrame(animate);
         }
 
-        init(); animate();
+        resize(); animate();
     </script>
 </body>
 </html>
