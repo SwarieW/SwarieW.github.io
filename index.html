@@ -25,7 +25,7 @@
             z-index: 1;
         }
 
-        /* UI PROFILE CARD */
+        /* UI PROFILE CARD / MODAL */
         .portfolio-container {
             position: absolute;
             top: 50%;
@@ -34,35 +34,40 @@
             z-index: 10;
             text-align: center;
             background: rgba(4, 18, 30, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 40px 50px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.05);
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 255, 255, 0.05);
             color: #e0f7fa;
             width: 85%;
-            max-width: 350px;
-            opacity: 0; /* Disembunyikan di awal */
+            max-width: 400px;
+            opacity: 0;
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .portfolio-container.active {
-            opacity: 1; /* Tampil saat active */
+            opacity: 1;
             pointer-events: auto;
             transform: translate(-50%, -50%) scale(1);
         }
 
         .profile-photo-wrapper {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 20px auto;
             border-radius: 50%;
-            padding: 5px;
+            padding: 4px;
             background: linear-gradient(135deg, #00ffcc, #0088aa);
             box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            display: none; /* Default hidden, shown only for profile */
+        }
+        
+        .profile-photo-wrapper.show {
+            display: block;
         }
 
         .profile-photo {
@@ -74,8 +79,8 @@
         }
 
         h1 {
-            margin: 0 0 8px 0;
-            font-size: 1.8em;
+            margin: 0 0 12px 0;
+            font-size: 1.6em;
             font-weight: 600;
             letter-spacing: 0.5px;
             color: #ffffff;
@@ -86,37 +91,50 @@
             margin: 0 0 30px 0;
             font-size: 0.95em;
             color: #80deea;
+            line-height: 1.5;
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
             padding: 8px 24px;
-            background: transparent;
-            border: 1px solid rgba(255, 50, 50, 0.6);
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px solid rgba(0, 255, 204, 0.5);
             border-radius: 30px;
             font-size: 0.8em;
             font-weight: bold;
-            color: #ffcccc;
+            color: #00ffcc;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            box-shadow: 0 0 10px rgba(255, 50, 50, 0.2), inset 0 0 10px rgba(255, 50, 50, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge.in-dev {
+            border-color: rgba(255, 50, 50, 0.6);
+            color: #ffcccc;
+            box-shadow: 0 0 10px rgba(255, 50, 50, 0.2);
         }
 
         .status-badge .dot {
             width: 6px;
             height: 6px;
-            background-color: #ff3333;
+            background-color: #00ffcc;
             border-radius: 50%;
             margin-right: 10px;
-            box-shadow: 0 0 8px #ff3333;
+            box-shadow: 0 0 8px #00ffcc;
             animation: pulse-dot 1.5s infinite;
+        }
+        
+        .status-badge.in-dev .dot {
+            background-color: #ff3333;
+            box-shadow: 0 0 8px #ff3333;
         }
 
         @keyframes pulse-dot {
-            0% { opacity: 0.5; box-shadow: 0 0 4px #ff3333; }
-            50% { opacity: 1; box-shadow: 0 0 12px #ff3333; }
-            100% { opacity: 0.5; box-shadow: 0 0 4px #ff3333; }
+            0% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+            100% { opacity: 0.5; transform: scale(1); }
         }
 
         #interaction-hint {
@@ -129,8 +147,19 @@
             pointer-events: none;
             z-index: 5;
             letter-spacing: 1px;
-            animation: blink 2s infinite;
+            animation: blink 2.5s infinite;
         }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
+            color: #00ffcc;
+            font-size: 1.2em;
+            opacity: 0.7;
+        }
+        .close-btn:hover { opacity: 1; }
 
         @keyframes blink {
             0%, 100% { opacity: 0.3; }
@@ -142,262 +171,576 @@
 
     <canvas id="bg-canvas"></canvas>
     
-    <div id="interaction-hint">Klik BTS Tengah untuk Membuka Profil</div>
+    <div id="interaction-hint">Jelajahi Jaringan: Klik Setiap Menara BTS</div>
 
     <div class="portfolio-container" id="profileCard">
-        <div class="profile-photo-wrapper">
-            <!-- Ganti src di bawah dengan link/path fotomu aslimu -->
-            <img src="ProfilePict.png" alt="William Halim" class="profile-photo">
-        </div>
-        <h1>William Halim</h1>
-        <p class="bio">Developer & Network Enthusiast.</p>
+        <div class="close-btn" id="closeBtn">✖</div>
         
-        <div class="status-badge">
-            <span class="dot"></span> IN DEVELOPMENT
+        <div class="profile-photo-wrapper" id="modalPhoto">
+            <!-- Ganti dengan fotomu -->
+            <img src="https://via.placeholder.com/150/002233/00ffcc?text=William" alt="William Halim" class="profile-photo">
+        </div>
+        
+        <h1 id="modalTitle">Title</h1>
+        <p class="bio" id="modalText">Deskripsi di sini...</p>
+        
+        <div class="status-badge" id="modalBadge">
+            <span class="dot"></span> <span id="badgeText">STATUS</span>
         </div>
     </div>
 
     <script>
+        // --- DATA CONTENT ---
+        const btsData = {
+            '-3': { 
+                title: 'Campus Life', 
+                text: 'Mahasiswa Teknik Telekomunikasi (FTE), Semester 6 di Jakarta. Aktif sebagai Asisten Praktikum. Memecahkan masalah akademis dengan pendekatan "First Principles Thinking".', 
+                badge: 'ACADEMIC', type: 'normal' 
+            },
+            '-2': { 
+                title: 'Internship & Skills', 
+                text: 'Fokus pada keamanan jaringan, analisis paket (Wireshark), dan konfigurasi server (SSH Tunneling). Aktif mencari peluang di industri IT dan perbaikan perangkat keras.', 
+                badge: 'EXPERIENCE', type: 'normal' 
+            },
+            '-1': { 
+                title: 'Game Development', 
+                text: 'Eksplorasi mekanika game dan pengembangan aktif menggunakan Godot, RPG Maker, dan Roblox Studio.', 
+                badge: 'IN DEVELOPMENT', type: 'in-dev' 
+            },
+            '0': { 
+                title: 'William Halim', 
+                text: 'Telecommunications Engineering Student. Lebih menyukai konfigurasi sistem digital & Linux dibanding sekadar merakit hardware, namun mampu mengeksekusi keduanya.', 
+                badge: 'PROFILE', type: 'normal', showPhoto: true 
+            },
+            '1': { 
+                title: 'Work & Startups', 
+                text: 'Berperan sebagai pemimpin tim wirausaha kampus di bidang F&B. Membangun Private Streaming Server dengan otomatisasi n8n & Cloudflare.', 
+                badge: 'IN DEVELOPMENT', type: 'in-dev' 
+            },
+            '2': { 
+                title: 'Personal Projects', 
+                text: 'Vending Machine IoT (Sensor air, UI 3D Arcade, QRIS), Utilitas Python Double Stub Matching, Server VoIP Asterisk, dan Proposal Bisnis Kinetic Floor.', 
+                badge: 'PORTFOLIO', type: 'normal' 
+            },
+            '3': { 
+                title: 'Gallery / Photo Dump', 
+                text: 'Kumpulan dokumentasi kegiatan merakit sirkuit hardware, modeling & rigging 3D di Blender (EEVEE engine), dan kehidupan sehari-hari.', 
+                badge: 'GALLERY', type: 'normal' 
+            }
+        };
+
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         const card = document.getElementById('profileCard');
         const hint = document.getElementById('interaction-hint');
         let w, h, groundLevel, seabedLevel;
 
-        let towers = [], pulses = [], fishes = [], rainDrops = [];
+        let towers = [];
+        let pulses = []; // Lingkaran sinyal
+        let fiberLights = []; // Cahaya di kabel fiber
+        let clouds = [];
+        let rainDrops = [];
+        let fishes = [];
+        let whale = null;
+        let underwaterBinary = [];
+        
         let frameCount = 0;
-        let cloudOffset = 0;
+        let hoveredTowerIndex = null;
+
+        // SEQUENCE MANAGER UNTUK SINYAL BTS
+        // Sinyal berawal dari tengah, tunggu menyentuh BTS sebelah, baru mereka bereaksi, dst.
+        let pulseSequence = {
+            activeTargetDistance: 0, 
+            maxDistance: 3, 
+            cooldown: 0,
+            pulseRadius: 0,
+            speed: 2 // Lebih lambat sesuai request
+        };
 
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
-            groundLevel = h * 0.55; // Garis tanah
-            seabedLevel = h * 0.95; // Dasar laut
+            groundLevel = h * 0.55; 
+            seabedLevel = h * 0.95; 
             init(); 
         }
         window.addEventListener('resize', resize);
 
-        // --- SISTEM INTERAKSI KLIK ---
-        let isHoveringCenter = false;
+        // --- SISTEM INTERAKSI ---
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
             
-            const centerT = towers.find(t => t.isCenter);
-            if (centerT) {
-                // Deteksi hitbox BTS tengah (diperlebar sedikit agar nyaman)
-                if (Math.abs(mouseX - centerT.x) < 40 && mouseY > groundLevel - centerT.th - 20 && mouseY <= groundLevel) {
+            hoveredTowerIndex = null;
+            canvas.style.cursor = 'default';
+
+            // Cek Hitbox Tower
+            for (let t of towers) {
+                // Hitbox responsif
+                if (Math.abs(mouseX - t.x) < (w < 600 ? 25 : 40) && mouseY > groundLevel - t.th - 30 && mouseY <= groundLevel) {
                     canvas.style.cursor = 'pointer';
-                    isHoveringCenter = true;
-                } else {
-                    canvas.style.cursor = 'default';
-                    isHoveringCenter = false;
+                    hoveredTowerIndex = t.index;
+                    break;
+                }
+            }
+            
+            // Cek Hitbox Awan
+            for (let c of clouds) {
+                if (Math.abs(mouseX - c.x) < c.w/2 && Math.abs(mouseY - c.y) < 40) {
+                    canvas.style.cursor = 'pointer';
                 }
             }
         });
 
         canvas.addEventListener('click', (e) => {
-            if (isHoveringCenter) {
-                // Membuka UI Card
-                card.classList.add('active');
-                hint.style.display = 'none';
-            } else if (!card.contains(e.target)) {
-                // Menutup UI Card jika klik di luar
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Klik Awan
+            for (let c of clouds) {
+                if (Math.abs(mouseX - c.x) < c.w/2 && Math.abs(mouseY - c.y) < 40) {
+                    c.shakeTimer = 30; // Bergetar
+                    // Spawn hujan biner dari awan
+                    for(let i=0; i<15; i++) {
+                        rainDrops.push({
+                            x: c.x - c.w/3 + Math.random() * (c.w*0.6),
+                            y: c.y + 10 + Math.random()*20,
+                            v: 2 + Math.random() * 2,
+                            char: Math.random() > 0.5 ? '0' : '1'
+                        });
+                    }
+                }
+            }
+
+            // Klik BTS
+            if (hoveredTowerIndex !== null) {
+                openModal(hoveredTowerIndex.toString());
+            } else if (!card.contains(e.target) && e.target !== document.getElementById('closeBtn')) {
                 card.classList.remove('active');
                 hint.style.display = 'block';
             }
         });
 
-        function init() {
-            towers = []; pulses = []; fishes = []; rainDrops = [];
-            
-            // Susunan Tower BTS (Side-View)
-            let centerTh = 100;
-            towers.push({ x: w / 2, y: groundLevel, isCenter: true, th: centerTh, tw: 30, cooldown: 0 });
-            
-            const gap = Math.min(w * 0.2, 200);
-            const satTh = 60; const satTw = 15;
-            towers.push({ x: w / 2 - gap, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
-            towers.push({ x: w / 2 - gap * 2, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
-            towers.push({ x: w / 2 + gap, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
-            towers.push({ x: w / 2 + gap * 2, y: groundLevel, isCenter: false, th: satTh, tw: satTw, cooldown: 0 });
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            card.classList.remove('active');
+            hint.style.display = 'block';
+        });
 
-            // Setup Ikan Robot Bawah Air
-            for (let i = 0; i < 5; i++) {
-                fishes.push({
-                    x: Math.random() * w,
-                    y: groundLevel + 40 + Math.random() * (seabedLevel - groundLevel - 80),
-                    vx: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random()),
-                    vy: 0, targetVy: 0, size: 20 + Math.random() * 10,
-                    timer: Math.random() * 100, wifiTick: Math.random() * 100
-                });
+        function openModal(indexKey) {
+            const data = btsData[indexKey];
+            if(!data) return;
+
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalText').innerText = data.text;
+            document.getElementById('badgeText').innerText = data.badge;
+            
+            const badge = document.getElementById('modalBadge');
+            if (data.type === 'in-dev') {
+                badge.classList.add('in-dev');
+            } else {
+                badge.classList.remove('in-dev');
             }
 
-            // Hujan Angka Biner
-            for (let i = 0; i < 40; i++) {
-                rainDrops.push({
-                    x: Math.random() * w, y: Math.random() * groundLevel,
-                    v: 1 + Math.random() * 1.5, char: Math.random() > 0.5 ? '0' : '1'
-                });
+            const photo = document.getElementById('modalPhoto');
+            if (data.showPhoto) {
+                photo.classList.add('show');
+            } else {
+                photo.classList.remove('show');
             }
+
+            card.classList.add('active');
+            hint.style.display = 'none';
         }
 
-        class Pulse {
-            constructor(x, y, maxR, isCenter) {
-                this.x = x; this.y = y; this.r = 10;
-                this.maxR = maxR; this.speed = isCenter ? 2.5 : 1.5;
-                this.isCenter = isCenter; this.active = true;
+        function init() {
+            towers = []; pulses = []; fiberLights = [];
+            clouds = []; rainDrops = []; fishes = []; underwaterBinary = [];
+            
+            // Susunan 7 Tower
+            // Dinamis sesuai ukuran layar
+            let gap = Math.max(Math.min(w / 8, 180), 50); // Minimal 50px jarak di layar hp
+            
+            for (let i = -3; i <= 3; i++) {
+                let isCenter = (i === 0);
+                towers.push({ 
+                    index: i,
+                    x: w / 2 + (i * gap), 
+                    y: groundLevel, 
+                    isCenter: isCenter, 
+                    th: isCenter ? 110 : (Math.abs(i) % 2 === 1 ? 70 : 50), // Variasi tinggi
+                    tw: isCenter ? 25 : 12, 
+                    cooldown: 0,
+                    activeResonance: false
+                });
             }
 
-            update() {
-                this.r += this.speed;
-                if (this.r > this.maxR) this.active = false;
+            // Inisialisasi Awan dengan pesan tersembunyi (Binary untuk kata motivasi)
+            // STAY CURIOUS -> Biner (Contoh simpel)
+            const binaryMessages = [
+                "01001011 01000101 01000101 01010000 00100000 01000111 01001111 01001001 01001110 01000111", // KEEP GOING
+                "01010011 01010100 01000001 01011001 00100000 01000011 01010101 01010010 01001001 01001111 01010101 01010011", // STAY CURIOUS
+                "01001110 01000101 01010110 01000101 01010010 00100000 01010011 01010100 01001111 01010000" // NEVER STOP
+            ];
 
-                if (this.isCenter) {
-                    towers.forEach(t => {
-                        if (!t.isCenter && t.cooldown <= 0) {
-                            let dist = Math.abs(this.x - t.x);
-                            if (Math.abs(this.r - dist) < this.speed + 1) {
-                                pulses.push(new Pulse(t.x, t.y - t.th, 200, false));
-                                t.cooldown = 120;
-                            }
-                        }
-                    });
+            for(let i=0; i<4; i++) {
+                clouds.push({
+                    x: Math.random() * w,
+                    y: 40 + Math.random() * 80,
+                    w: 200 + Math.random() * 150,
+                    speed: (0.1 + Math.random() * 0.3) * (Math.random()>0.5 ? 1 : -1),
+                    bobPhase: Math.random() * Math.PI * 2,
+                    binaryText: binaryMessages[i % binaryMessages.length],
+                    shakeTimer: 0
+                });
+            }
+
+            // Ikan Robot Bawah Air
+            for (let i = 0; i < 6; i++) {
+                fishes.push(createFish());
+            }
+
+            // Paus Besar
+            whale = {
+                x: -400,
+                y: seabedLevel - 150,
+                vx: 0.8,
+                size: 90,
+                wifiTick: 0,
+                active: false,
+                cooldown: 500
+            };
+        }
+
+        function createFish() {
+            return {
+                x: Math.random() * w,
+                y: groundLevel + 50 + Math.random() * (seabedLevel - groundLevel - 100),
+                vx: (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random()),
+                vy: 0, targetVy: 0, 
+                size: 15 + Math.random() * 15,
+                type: Math.floor(Math.random() * 3), // Variasi bentuk ikan
+                timer: Math.random() * 100, wifiTick: Math.random() * 100
+            };
+        }
+
+        // --- DRAWING FUNCTIONS ---
+
+        function drawEnvironment() {
+            // Langit Gelap
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, groundLevel);
+            skyGrad.addColorStop(0, '#000814'); skyGrad.addColorStop(1, '#001a33');
+            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, groundLevel);
+
+            // Bawah Tanah & Laut (Lebih gelap)
+            let seaGrad = ctx.createLinearGradient(0, groundLevel, 0, h);
+            seaGrad.addColorStop(0, '#001122'); seaGrad.addColorStop(1, '#00030a');
+            ctx.fillStyle = seaGrad; ctx.fillRect(0, groundLevel, w, h - groundLevel);
+
+            // Garis Pembatas Tanah
+            ctx.strokeStyle = 'rgba(255, 255, 0, 0.7)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, groundLevel); ctx.lineTo(w, groundLevel); ctx.stroke();
+            
+            // Garis Dasar Laut
+            ctx.strokeStyle = 'rgba(0, 150, 255, 0.5)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, seabedLevel); ctx.lineTo(w, seabedLevel); ctx.stroke();
+            
+            // Arsiran Air di Dasar
+            ctx.strokeStyle = 'rgba(0, 150, 255, 0.3)'; ctx.lineWidth = 2;
+            for(let i=0; i<w; i+=50) {
+                ctx.beginPath(); ctx.moveTo(i, seabedLevel + 10); ctx.lineTo(i - 30, h); ctx.stroke();
+            }
+
+            // --- Hujan Biner (Langit) ---
+            ctx.fillStyle = 'rgba(255, 50, 50, 0.5)';
+            ctx.font = '12px monospace';
+            for (let i = rainDrops.length - 1; i >= 0; i--) {
+                let drop = rainDrops[i];
+                ctx.fillText(drop.char, drop.x, drop.y);
+                drop.y += drop.v;
+                if (frameCount % 10 === 0 && Math.random() > 0.8) drop.char = Math.random() > 0.5 ? '0' : '1';
+                
+                // Hapus jika menyentuh tanah
+                if (drop.y > groundLevel) {
+                    rainDrops.splice(i, 1);
                 }
             }
 
-            draw(ctx) {
-                let ratio = this.r / this.maxR;
-                let cR, cG, cB = 0;
+            // --- Gelembung Biner Jatuh (Bawah Air) ---
+            if (frameCount % 10 === 0) {
+                underwaterBinary.push({
+                    x: Math.random() * w,
+                    y: groundLevel + 10,
+                    v: 0.5 + Math.random() * 1,
+                    char: Math.random() > 0.5 ? '0' : '1',
+                    alpha: 0.1 + Math.random() * 0.4
+                });
+            }
 
-                // Gradien Pulse: Hijau -> Merah -> Fade
-                if (ratio < 0.5) {
-                    let localRatio = ratio / 0.5;
-                    cR = Math.floor(localRatio * 255);
-                    cG = Math.floor((1 - localRatio) * 150 + 100);
-                } else {
-                    let localRatio = (ratio - 0.5) / 0.5;
-                    cR = Math.floor((1 - localRatio) * 255 + localRatio * 50);
-                    cG = 0;
+            ctx.font = '14px monospace';
+            for (let i = underwaterBinary.length - 1; i >= 0; i--) {
+                let ub = underwaterBinary[i];
+                ctx.fillStyle = `rgba(0, 200, 255, ${ub.alpha})`; // Biru pudar
+                ctx.fillText(ub.char, ub.x, ub.y);
+                ub.y += ub.v; // Mengarah ke tanah (bawah)
+                if (frameCount % 20 === 0 && Math.random() > 0.8) ub.char = Math.random() > 0.5 ? '0' : '1';
+                
+                if (ub.y > seabedLevel) {
+                    underwaterBinary.splice(i, 1);
+                }
+            }
+
+            // --- Awan Non-Linear ---
+            for (let c of clouds) {
+                c.x += c.speed;
+                c.bobPhase += 0.02;
+                let drawY = c.y + Math.sin(c.bobPhase) * 10;
+                let drawX = c.x;
+
+                // Wrap around
+                if (c.x > w + c.w) c.x = -c.w;
+                if (c.x < -c.w) c.x = w + c.w;
+
+                // Efek getar jika diklik
+                if (c.shakeTimer > 0) {
+                    drawX += (Math.random() * 6 - 3);
+                    drawY += (Math.random() * 6 - 3);
+                    c.shakeTimer--;
                 }
 
                 ctx.save();
+                ctx.translate(drawX, drawY);
+                
+                // Gambar Awan
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
                 ctx.beginPath();
-                // Arc Math.PI ke 0 membuat lengkungan menghadap ke ATAS
-                ctx.arc(this.x, this.y, this.r, Math.PI, 0);
-                ctx.strokeStyle = `rgba(${cR}, ${cG}, ${cB}, ${1 - ratio})`;
-                ctx.lineWidth = this.isCenter ? 3 : 1.5;
-                ctx.stroke();
+                ctx.arc(-c.w*0.25, 0, c.w*0.25, 0, Math.PI*2);
+                ctx.arc(0, -c.w*0.1, c.w*0.3, 0, Math.PI*2);
+                ctx.arc(c.w*0.25, 0, c.w*0.2, 0, Math.PI*2);
+                ctx.fill();
+
+                // Text Biner terbatas dalam awan (Clip)
+                ctx.clip(); // Masking text agar tidak keluar dari bentuk awan
+                
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.4)';
+                ctx.font = '10px monospace';
+                ctx.textAlign = 'center';
+                // Word wrap logic sederhana
+                let words = c.binaryText.split(' ');
+                let line = '';
+                let yPos = -10;
+                for(let i = 0; i < words.length; i++) {
+                    if (line.length > 15) {
+                        ctx.fillText(line, 0, yPos);
+                        line = '';
+                        yPos += 15;
+                    }
+                    line += words[i] + ' ';
+                }
+                ctx.fillText(line, 0, yPos);
+                
                 ctx.restore();
             }
-        }
 
-        function drawEnvironment() {
-            // Langit
-            let skyGrad = ctx.createLinearGradient(0, 0, 0, groundLevel);
-            skyGrad.addColorStop(0, '#001122'); skyGrad.addColorStop(1, '#002233');
-            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, groundLevel);
+            // --- Paus Besar ---
+            if (whale.active) {
+                whale.x += whale.vx;
+                whale.wifiTick += 1.5;
 
-            // Bawah Tanah / Air
-            let seaGrad = ctx.createLinearGradient(0, groundLevel, 0, h);
-            seaGrad.addColorStop(0, '#001a33'); seaGrad.addColorStop(1, '#000511');
-            ctx.fillStyle = seaGrad; ctx.fillRect(0, groundLevel, w, h - groundLevel);
-
-            // Garis pembatas
-            ctx.strokeStyle = '#ffff00'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(0, groundLevel); ctx.lineTo(w, groundLevel); ctx.stroke();
-            
-            ctx.strokeStyle = '#00aaff'; 
-            ctx.beginPath(); ctx.moveTo(0, seabedLevel); ctx.lineTo(w, seabedLevel); ctx.stroke();
-            
-            // Tekstur air seabed
-            ctx.strokeStyle = '#00aaff'; ctx.lineWidth = 2;
-            for(let i=0; i<w; i+=40) {
-                ctx.beginPath(); ctx.moveTo(i, seabedLevel + 10); ctx.lineTo(i - 20, h); ctx.stroke();
-            }
-
-            // Awan & Kode
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.font = '14px monospace';
-            cloudOffset -= 0.3;
-            if (cloudOffset < -w) cloudOffset = 0;
-            
-            const cloudCode = "01001100 01001111 01000001 01000100 01001001 01001110 01000111";
-            for (let i = 0; i < 3; i++) {
-                ctx.beginPath();
-                ctx.arc(cloudOffset + w*i + 100, 50, 40, 0, Math.PI*2);
-                ctx.arc(cloudOffset + w*i + 150, 40, 50, 0, Math.PI*2);
-                ctx.arc(cloudOffset + w*i + 200, 50, 40, 0, Math.PI*2);
-                ctx.fill();
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.translate(whale.x, whale.y);
                 
-                ctx.fillStyle = 'rgba(0, 255, 204, 0.3)';
-                ctx.fillText(cloudCode, cloudOffset + w*i + 80, 50);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                // Bentuk Paus
+                ctx.fillStyle = '#004488';
+                ctx.strokeStyle = '#0088ff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, whale.size, whale.size/2.5, 0, 0, Math.PI*2);
+                ctx.fill(); ctx.stroke();
+                
+                // Ekor Paus
+                ctx.beginPath();
+                ctx.moveTo(-whale.size + 10, 0);
+                ctx.lineTo(-whale.size - 40, -40);
+                ctx.lineTo(-whale.size - 40, 40);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+
+                // Logo WiFi Raksasa
+                ctx.strokeStyle = '#00ffcc';
+                ctx.lineWidth = 3;
+                let wifiCycle = (whale.wifiTick % 120) / 120;
+                for (let i = 1; i <= 4; i++) {
+                    if (wifiCycle * 4 > i - 1) {
+                        ctx.beginPath(); 
+                        ctx.arc(30, -30, i * 15, Math.PI * 1.25, Math.PI * 1.75); 
+                        ctx.stroke();
+                    }
+                }
+
+                ctx.restore();
+
+                if (whale.x > w + 200) {
+                    whale.active = false;
+                    whale.cooldown = 800 + Math.random() * 500; // Muncul lagi nanti
+                }
+            } else {
+                whale.cooldown--;
+                if (whale.cooldown <= 0) {
+                    whale.active = true;
+                    whale.x = -200;
+                    whale.y = groundLevel + 100 + Math.random() * (seabedLevel - groundLevel - 200);
+                }
             }
 
-            // Hujan 01
-            ctx.fillStyle = 'rgba(255, 50, 50, 0.4)';
-            ctx.font = '12px monospace';
-            rainDrops.forEach(drop => {
-                ctx.fillText(drop.char, drop.x, drop.y);
-                drop.y += drop.v;
-                if (frameCount % 15 === 0 && Math.random() > 0.8) drop.char = Math.random() > 0.5 ? '0' : '1';
-                if (drop.y > groundLevel) drop.y = 0;
-            });
-
-            // Ikan Robot
+            // --- Ikan Robot (Variasi) ---
             fishes.forEach(f => {
                 f.x += f.vx; f.y += f.vy;
                 if (f.x < -50) f.x = w + 50; if (f.x > w + 50) f.x = -50;
-                if (f.y < groundLevel + 20) f.y = groundLevel + 20;
-                if (f.y > seabedLevel - 20) f.y = seabedLevel - 20;
+                if (f.y < groundLevel + 30) f.y = groundLevel + 30;
+                if (f.y > seabedLevel - 30) f.y = seabedLevel - 30;
 
                 f.timer++;
                 if (f.timer > 80) {
                     f.timer = 0;
-                    f.vx = Math.sign(f.vx) * (0.8 + Math.random());
-                    f.targetVy = (Math.random() - 0.5) * 0.8;
+                    f.vx = Math.sign(f.vx) * (0.5 + Math.random()*0.5);
+                    f.targetVy = (Math.random() - 0.5) * 1.2;
                 }
-                f.vy += (f.targetVy - f.vy) * 0.1; f.wifiTick += 2;
+                f.vy += (f.targetVy - f.vy) * 0.05; f.wifiTick += 2;
 
-                ctx.save(); ctx.globalAlpha = 0.4; ctx.translate(f.x, f.y);
-                ctx.strokeStyle = '#3366ff'; ctx.lineWidth = 2;
-                ctx.beginPath();
-                if (f.vx > 0) {
-                    ctx.moveTo(f.size, 0); ctx.lineTo(-f.size, -f.size/2); ctx.lineTo(-f.size, f.size/2); ctx.closePath(); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(-f.size, 0); ctx.lineTo(-f.size*1.5, -f.size/2); ctx.lineTo(-f.size*1.5, f.size/2); ctx.closePath(); ctx.stroke();
-                } else {
-                    ctx.moveTo(-f.size, 0); ctx.lineTo(f.size, -f.size/2); ctx.lineTo(f.size, f.size/2); ctx.closePath(); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(f.size, 0); ctx.lineTo(f.size*1.5, -f.size/2); ctx.lineTo(f.size*1.5, f.size/2); ctx.closePath(); ctx.stroke();
-                }
-                
+                ctx.save(); ctx.globalAlpha = 0.5; ctx.translate(f.x, f.y);
                 ctx.strokeStyle = '#3366ff'; ctx.lineWidth = 1.5;
+                ctx.fillStyle = 'rgba(0, 30, 80, 0.5)';
+                
+                let dir = Math.sign(f.vx);
+                ctx.beginPath();
+                
+                if (f.type === 0) { // Tipe 1: Segitiga tajam
+                    ctx.moveTo(dir * f.size, 0); 
+                    ctx.lineTo(dir * -f.size, -f.size/2); 
+                    ctx.lineTo(dir * -f.size, f.size/2);
+                } else if (f.type === 1) { // Tipe 2: Diamond
+                    ctx.moveTo(dir * f.size, 0);
+                    ctx.lineTo(0, -f.size/2);
+                    ctx.lineTo(dir * -f.size, 0);
+                    ctx.lineTo(0, f.size/2);
+                } else { // Tipe 3: Kotak ramping (seperti kapal selam)
+                    ctx.rect(dir * -f.size, -f.size/3, f.size*2, f.size/1.5);
+                }
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+                
+                // Sinyal Wi-Fi Kecil
+                ctx.strokeStyle = '#00aaff'; ctx.lineWidth = 1;
                 let wifiCycle = (f.wifiTick % 100) / 100;
                 for (let i = 1; i <= 3; i++) {
                     if (wifiCycle * 3 > i - 1) {
-                        ctx.beginPath(); ctx.arc(0, -f.size * 0.8, i * 5, Math.PI * 1.25, Math.PI * 1.75); ctx.stroke();
+                        ctx.beginPath(); ctx.arc(0, -f.size * 0.8, i * 4, Math.PI * 1.25, Math.PI * 1.75); ctx.stroke();
                     }
                 }
                 ctx.restore();
             });
         }
 
+        // --- SISTEM FIBER & RESONANSI ---
+
+        // Fungsi gambar rumah kecil
+        function drawHouse(x, y) {
+            ctx.fillStyle = 'rgba(10, 30, 50, 0.8)';
+            ctx.strokeStyle = 'rgba(0, 200, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.rect(x - 8, y - 10, 16, 10);
+            ctx.moveTo(x - 10, y - 10); ctx.lineTo(x, y - 18); ctx.lineTo(x + 10, y - 10);
+            ctx.fill(); ctx.stroke();
+        }
+
         function drawInfrastructure() {
-            // Fiber Backbone
-            let centerT = towers.find(t => t.isCenter);
-            if (centerT) {
-                let grad = ctx.createLinearGradient(centerT.x, seabedLevel, centerT.x, groundLevel);
-                grad.addColorStop(0, '#00ff00'); grad.addColorStop(1, '#ff0000');
-                
-                ctx.strokeStyle = grad; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.moveTo(centerT.x, seabedLevel); ctx.lineTo(centerT.x, groundLevel); ctx.stroke();
+            // BACKBONE DAN PERCABANGAN FIBER COMPLEX
+            let gap = towers.length > 1 ? Math.abs(towers[1].x - towers[0].x) : 100;
+            let centerX = w / 2;
+            let branchDepthY = seabedLevel - 40;
+
+            // Gambar Kabel Statis (Jalur)
+            ctx.strokeStyle = 'rgba(50, 50, 50, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            // Tiang utama dari bawah
+            ctx.moveTo(centerX, h); ctx.lineTo(centerX, branchDepthY);
+            // Cabang Horizontal
+            ctx.moveTo(towers[0].x, branchDepthY); ctx.lineTo(towers[towers.length-1].x, branchDepthY);
+            
+            // Garis naik ke setiap Tower & Rumah
+            towers.forEach(t => {
+                ctx.moveTo(t.x, branchDepthY); ctx.lineTo(t.x, groundLevel);
+                // Percabangan ke rumah
+                ctx.moveTo(t.x, groundLevel - 5); ctx.lineTo(t.x - 25, groundLevel - 5);
+                ctx.moveTo(t.x, groundLevel - 5); ctx.lineTo(t.x + 25, groundLevel - 5);
+            });
+            ctx.stroke();
+
+            // Animasi Cahaya Merambat di Fiber
+            if (frameCount % 60 === 0) {
+                // Munculkan paket cahaya baru dari backbone bawah
+                towers.forEach(t => {
+                    fiberLights.push({
+                        targetX: t.x,
+                        progress: 0, // 0 sampai 1
+                        speed: 0.01 + Math.random() * 0.005 // Cukup cepat
+                    });
+                });
             }
 
-            // Struktur BTS
+            for (let i = fiberLights.length - 1; i >= 0; i--) {
+                let fl = fiberLights[i];
+                fl.progress += fl.speed;
+
+                let curX, curY;
+                // Path logic: 0-0.3 (Naik ke percabangan), 0.3-0.6 (Gerak horizontal), 0.6-1.0 (Naik ke BTS)
+                if (fl.progress < 0.3) {
+                    let p = fl.progress / 0.3;
+                    curX = centerX;
+                    curY = h - p * (h - branchDepthY);
+                } else if (fl.progress < 0.6) {
+                    let p = (fl.progress - 0.3) / 0.3;
+                    curX = centerX + (fl.targetX - centerX) * p;
+                    curY = branchDepthY;
+                } else {
+                    let p = (fl.progress - 0.6) / 0.4;
+                    curX = fl.targetX;
+                    curY = branchDepthY - p * (branchDepthY - groundLevel);
+                }
+
+                // Warna: Biru di bawah, Hijau di tengah, Merah di ujung
+                let cR = Math.floor(fl.progress * 255);
+                let cG = fl.progress < 0.5 ? Math.floor(fl.progress*2 * 255) : Math.floor((1 - fl.progress)*2 * 255);
+                let cB = Math.floor((1 - fl.progress) * 255);
+
+                ctx.shadowColor = `rgb(${cR}, ${cG}, ${cB})`;
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = `rgb(${cR}, ${cG}, ${cB})`;
+                
+                ctx.beginPath();
+                ctx.arc(curX, curY, 3, 0, Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset
+
+                // Hapus jika sudah sampai tanah
+                if (fl.progress >= 1) {
+                    fiberLights.splice(i, 1);
+                }
+            }
+
+            // Gambar Tower dan Rumah Kecil
             towers.forEach(t => {
+                // Rumah kecil di kaki
+                drawHouse(t.x - 25, groundLevel);
+                drawHouse(t.x + 25, groundLevel);
+
+                // Struktur Tower BTS
                 ctx.save(); ctx.translate(t.x, t.y);
-                ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(200, 200, 200, 0.6)'; ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(-t.tw/2, 0); ctx.lineTo(0, -t.th);
                 ctx.moveTo(t.tw/2, 0); ctx.lineTo(0, -t.th);
@@ -405,41 +748,95 @@
                 ctx.moveTo(-t.tw/6, -t.th*2/3); ctx.lineTo(t.tw/6, -t.th*2/3);
                 ctx.stroke();
 
-                // Efek Neon jika kursor Hover BTS Tengah
-                if (t.isCenter && isHoveringCenter) {
+                // Glow logic
+                if (hoveredTowerIndex === t.index) {
                     ctx.shadowColor = '#00ffcc'; ctx.shadowBlur = 15;
                     ctx.strokeStyle = '#00ffcc'; ctx.stroke();
-                } else if (t.isCenter) {
-                     ctx.shadowColor = 'rgba(255,255,255,0.3)'; ctx.shadowBlur = 5;
-                     ctx.strokeStyle = '#ffffff'; ctx.stroke();
-                } else {
-                     ctx.strokeStyle = '#ffffff'; ctx.stroke();
+                } else if (t.activeResonance) {
+                    ctx.shadowColor = '#ff3333'; ctx.shadowBlur = 15;
+                    ctx.strokeStyle = '#ff3333'; ctx.stroke();
                 }
                 ctx.restore();
             });
         }
 
+        // --- SISTEM SEQUENTIAL PULSE FULL CIRCLE ---
+        function handlePulses() {
+            let gap = towers.length > 1 ? Math.abs(towers[1].x - towers[0].x) : 100;
+            
+            // Logic State Machine Sequence
+            if (pulseSequence.cooldown > 0) {
+                pulseSequence.cooldown--;
+            } else {
+                pulseSequence.pulseRadius += pulseSequence.speed;
+                
+                // Menghitung indeks tower yang harus aktif
+                let currentStep = Math.floor(pulseSequence.pulseRadius / gap);
+                
+                // Resonansi: Set aktif tower jika tersentuh lingkaran
+                towers.forEach(t => {
+                    if (Math.abs(t.index) === currentStep) {
+                        t.activeResonance = true;
+                    } else {
+                        t.activeResonance = false;
+                    }
+                });
+
+                // Jika lingkaran pusat sudah melewati tower terluar (index 3)
+                if (currentStep > pulseSequence.maxDistance) {
+                    // Reset siklus
+                    pulseSequence.pulseRadius = 0;
+                    pulseSequence.cooldown = 100; // Jeda sebelum mengulang
+                    towers.forEach(t => t.activeResonance = false);
+                }
+            }
+
+            // Menggambar Lingkaran Penuh (Full Circle)
+            if (pulseSequence.pulseRadius > 0) {
+                let centerT = towers.find(t => t.index === 0);
+                if (centerT) {
+                    let maxR = gap * (pulseSequence.maxDistance + 1);
+                    let ratio = pulseSequence.pulseRadius / maxR;
+                    
+                    // Transisi Warna: Hijau -> Merah -> Hitam/Pudar
+                    let cR, cG;
+                    if (ratio < 0.5) {
+                        let localRatio = ratio / 0.5;
+                        cR = Math.floor(localRatio * 255);
+                        cG = Math.floor((1 - localRatio) * 150 + 100);
+                    } else {
+                        let localRatio = (ratio - 0.5) / 0.5;
+                        cR = Math.floor((1 - localRatio) * 255 + localRatio * 50);
+                        cG = 0;
+                    }
+
+                    ctx.save();
+                    ctx.beginPath();
+                    // FULL CIRCLE (Math.PI * 2) yang memotong tanah
+                    ctx.arc(centerT.x, centerT.y - centerT.th, pulseSequence.pulseRadius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(${cR}, ${cG}, 0, ${1 - ratio})`;
+                    ctx.lineWidth = 2;
+                    // Supaya tidak menimpa UI, pastikan alpha diatur dengan globalAlpha
+                    ctx.globalAlpha = Math.max(0, 1 - ratio);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+
         function animate() {
             ctx.clearRect(0, 0, w, h);
-            drawEnvironment(); drawInfrastructure();
-
-            let centerT = towers.find(t => t.isCenter);
-            if (centerT && frameCount % 120 === 0) {
-                pulses.push(new Pulse(centerT.x, centerT.y - centerT.th, Math.max(w, h) * 0.6, true));
-            }
-
-            for (let i = pulses.length - 1; i >= 0; i--) {
-                pulses[i].update(); pulses[i].draw(ctx);
-                if (!pulses[i].active) pulses.splice(i, 1);
-            }
-
-            towers.forEach(t => { if(t.cooldown > 0) t.cooldown--; });
+            
+            drawEnvironment();
+            drawInfrastructure();
+            handlePulses();
 
             frameCount++;
             requestAnimationFrame(animate);
         }
 
-        resize(); animate();
+        resize(); 
+        animate();
     </script>
 </body>
 </html>
