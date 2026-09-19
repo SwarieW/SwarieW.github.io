@@ -165,6 +165,49 @@
             0%, 100% { opacity: 0.3; }
             50% { opacity: 1; }
         }
+        /* --- IMAGE DUMP GALLERY STYLES --- */
+        .image-dump-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .dump-item {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+        .dump-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+        }
+        .dump-caption {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #80deea;
+            font-style: italic;
+        }
+        /* Make the modal scrollable if there are many pictures */
+        .portfolio-container {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        /* Custom Scrollbar for Modal */
+        .portfolio-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .portfolio-container::-webkit-scrollbar-track {
+            background: rgba(0, 17, 34, 0.5); 
+            border-radius: 10px;
+        }
+        .portfolio-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 204, 0.5); 
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -190,41 +233,52 @@
     </div>
 
     <script>
-        // --- DATA CONTENT ---
         const btsData = {
             '-3': { 
-                title: 'Campus Life', 
-                text: 'Mahasiswa Teknik Telekomunikasi (FTE), Semester 6 di Jakarta. Aktif sebagai Asisten Praktikum. Memecahkan masalah akademis dengan pendekatan "First Principles Thinking".', 
-                badge: 'ACADEMIC', type: 'normal' 
+                title: 'Campus Life & Engineering', 
+                text: 'Mahasiswa Teknik Telekomunikasi (FTE), Telkom University Jakarta. Aktif memecahkan masalah akademis dengan pendekatan "First Principles Thinking".', 
+                badge: 'ACADEMIC', type: 'normal',
+                images: [
+                    { src: 'rf_circuit.jpg', caption: 'Simulasi sirkuit RF/Microwave kompleks.' }
+                ]
             },
             '-2': { 
                 title: 'Internship & Skills', 
-                text: 'Fokus pada keamanan jaringan, analisis paket (Wireshark), dan konfigurasi server (SSH Tunneling). Aktif mencari peluang di industri IT dan perbaikan perangkat keras.', 
-                badge: 'EXPERIENCE', type: 'normal' 
+                text: 'Fokus pada infrastruktur jaringan, keamanan, dan sistem operasi Linux.<br><ul class="achievement-list"><li><b>Server OS:</b> Manajemen Linux via command line, SSH Tunneling, Nginx Reverse Proxy.</li></ul>', 
+                badge: 'EXPERIENCE', type: 'normal',
+                images: [
+                    { src: 'ssh_terminal.jpg', caption: 'Konfigurasi CA Keys SSH (TrustedUserCAKeys) untuk keamanan otentikasi Raspberry Pi.' }
+                ]
             },
             '-1': { 
                 title: 'Game Development', 
-                text: 'Eksplorasi mekanika game dan pengembangan aktif menggunakan Godot, RPG Maker, dan Roblox Studio.', 
-                badge: 'IN DEVELOPMENT', type: 'in-dev' 
+                text: 'Eksplorasi mekanika game dan pengembangan aktif menggunakan Godot, RPG Maker.', 
+                badge: 'IN DEVELOPMENT', type: 'in-dev',
+                images: [
+                    { src: 'game_ui.jpg', caption: 'Purwarupa UI Drawing Studio & Battle Log.' }
+                ]
             },
             '0': { 
                 title: 'William Halim', 
-                text: 'Telecommunications Engineering Student. Lebih menyukai konfigurasi sistem digital & Linux dibanding sekadar merakit hardware, namun mampu mengeksekusi keduanya.', 
+                text: 'Telecommunications Engineering Student.<br>Berfokus pada IT Infrastructure, Secure Networking, dan Containerization.<br><br><div style="text-align: left; color: #00ffcc; font-size: 0.9em; margin-bottom: 5px;">📄 Preview Curriculum Vitae:</div><div style="border: 1px solid rgba(0, 255, 204, 0.4); border-radius: 8px; overflow: hidden; height: 350px; background: rgba(255,255,255,0.9);"><iframe src="CVwilliamHalim.pdf" width="100%" height="100%" style="border: none;"></iframe></div><a href="CV_William_Halim.pdf" target="_blank" class="modal-link" style="display: block; text-align: center; margin-top: 15px; background: rgba(0, 255, 204, 0.2);">👁️ Buka CV Full HD / Download</a>', 
                 badge: 'PROFILE', type: 'normal', showPhoto: true 
             },
             '1': { 
                 title: 'Work & Startups', 
-                text: 'Berperan sebagai pemimpin tim wirausaha kampus di bidang F&B. Membangun Private Streaming Server dengan otomatisasi n8n & Cloudflare.', 
+                text: 'None at the moment', 
                 badge: 'IN DEVELOPMENT', type: 'in-dev' 
             },
             '2': { 
                 title: 'Personal Projects', 
-                text: 'Vending Machine IoT (Sensor air, UI 3D Arcade, QRIS), Utilitas Python Double Stub Matching, Server VoIP Asterisk, dan Proposal Bisnis Kinetic Floor.', 
-                badge: 'PORTFOLIO', type: 'normal' 
+                text: 'Bereksperimen dengan Machine Learning dan Computer Vision menggunakan Python.', 
+                badge: 'PORTFOLIO', type: 'normal',
+                images: [
+                    { src: 'gesture_code.jpg', caption: 'Kalkulasi jarak thumb-to-palm (landmarks) pada "Final Gesture Engine" menggunakan Python.' }
+                ]
             },
             '3': { 
-                title: 'Gallery / Photo Dump', 
-                text: 'Kumpulan dokumentasi kegiatan merakit sirkuit hardware, modeling & rigging 3D di Blender (EEVEE engine), dan kehidupan sehari-hari.', 
+                title: 'Gallery', 
+                text: 'Kumpulan eksperimen infrastruktur dan dokumentasi pribadi.<br><ul class="achievement-list"><li><b>Zero Trust Web App:</b> Multi-container Docker & Cloudflare Tunnels.</li></ul><a href="https://github.com/Username-Github-Kamu" target="_blank" class="modal-link">🔗 View Repositories</a>', 
                 badge: 'GALLERY', type: 'normal' 
             }
         };
@@ -333,7 +387,26 @@
             if(!data) return;
 
             document.getElementById('modalTitle').innerText = data.title;
-            document.getElementById('modalText').innerText = data.text;
+            
+            // Build the core text
+            let contentHTML = data.text;
+            
+            // Dynamically generate the image dump gallery if images exist
+            if (data.images && data.images.length > 0) {
+                contentHTML += '<div class="image-dump-container">';
+                data.images.forEach(img => {
+                    // It automatically appends 'pict/' to the path!
+                    contentHTML += `
+                        <div class="dump-item">
+                            <img src="pict/${img.src}" alt="${img.caption}">
+                            <div class="dump-caption">${img.caption}</div>
+                        </div>
+                    `;
+                });
+                contentHTML += '</div>';
+            }
+            
+            document.getElementById('modalText').innerHTML = contentHTML;
             document.getElementById('badgeText').innerText = data.badge;
             
             const badge = document.getElementById('modalBadge');
